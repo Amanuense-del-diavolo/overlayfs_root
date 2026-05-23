@@ -7,6 +7,7 @@ run_hook() {
         mkdir -p /overlay/lower
         mkdir -p /overlay/upper
 
+        
         rmdir /new_root
         ln -s /overlay/lower /new_root
 }
@@ -16,7 +17,13 @@ run_latehook() {
         mkdir -p /new_root
 
         msg "→ mounting upperdir to /overlay/upper "
-        mount ${upperdir} /overlay/upper
+        #checking if overlay tmpfs or other fs
+        if [[ "${upperdir}" == "tmpfs" ]]
+        {
+                mount -o tmpfs tmpfs /overlay/upper
+                mkdir -p /overlay/upper/root
+                mkdir -p /overlay/upper/work
+        }
         msg "→ mounting overlayfs"
         mount -t overlay overlay -o lowerdir=/overlay/lower,upperdir=/overlay/upper/root,workdir=/overlay/upper/work /new_root
 
